@@ -32,20 +32,24 @@ state_data <- read_csv("covid_state_ctp.csv")%>%
 state_data2 <- transform(state_data, x = as.Date(as.character(date), "%Y%m%d"))%>%
   select(x, state, positive, positiveIncrease, negative, recovered, death, deathIncrease, hospitalizedCumulative, hospitalizedCurrently, hospitalizedIncrease, total_test)%>%
   rename("date" = x)
+  
 ```
 
-```{r, cache= TRUE, fig.height= 10, fig.width= 10}
+```{r, cache= TRUE, fig.height= 9, fig.width= 9}
 ############################
 # NEW DAILY POSITIVE CASES in EACH state FACETTED
 ############################
 state_data2%>%
-  ggplot(aes(date, positiveIncrease, colour = "var0"))+
-  geom_line()+
+  ggplot(aes(date, positiveIncrease, colour = "steelblue4"))+
+  geom_line(colour = "steelblue4")+
   facet_wrap(vars(state))+
-  labs(title = "New Positive Cases in Each State",
+  labs(title = "Daily New Positive Cases in Each State",
        caption = "Graph: Carine Hajjar\n Data: Covid Tracking Project", 
        y = "Count", 
        x = "Date")+
+  theme_bw() +
+  theme(panel.border = element_blank(), panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), axis.line = element_line(colour = "black")) +
   theme(plot.title = element_text(hjust = 0.5))+
   theme(plot.title = element_text(face = "bold"))+
   theme(plot.subtitle = element_text(hjust = 0.5))+
@@ -63,18 +67,24 @@ state_data2%>%
 # increase of "CA", "TX", "FL", "AZ" OT
 state_data2%>%
   filter(state %in% c("CA", "TX", "FL", "AZ"))%>%
-  ggplot(aes(date, positiveIncrease, colour = "var0"))+
-  geom_line()+
+  filter(date>= as.Date("2020-04-20"))%>%
+  ggplot(aes(date, positiveIncrease, colour = "steelblue4"))+
+  geom_col(colour = "steelblue4")+
   facet_wrap(vars(state))+
-  labs(title = "New Daily Positive Cases in Arizona, California, Florida, and Texas",
+  labs(title = "Daily New Positive Cases in Arizona, California, Florida, and Texas",
+       subtitle = "April 20th to July 13th",
        caption = "Graph: Carine Hajjar\n Data: Covid Tracking Project", 
        y = "Count", 
        x = "Date")+
+  theme_bw() +
+  theme(panel.border = element_blank(), panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), axis.line = element_line(colour = "black")) +
   theme(plot.title = element_text(hjust = 0.5))+
   theme(plot.title = element_text(face = "bold"))+
   theme(plot.subtitle = element_text(hjust = 0.5))+
   theme(legend.title = element_blank(), 
         legend.position = "none")
+        
 
 # cases definitely going up -- but lets look at deaths 
 
@@ -83,13 +93,18 @@ state_data2%>%
 ############################
 state_data2%>%
   filter(state %in% c("CA", "TX", "FL", "AZ"))%>%
-  ggplot(aes(date, deathIncrease, colour = "var0"))+
-  geom_line()+
+  filter(date>= as.Date("2020-04-20"))%>%
+  ggplot(aes(date, deathIncrease, colour = "steelblue4"))+
+  geom_col(binwidth = 2, colour = "steelblue4")+
   facet_wrap(vars(state))+
-  labs(title = "New Daily Deaths in Arizona, California, Florida, and Texas",
+  labs(title = "Daily New Deaths in Arizona, California, Florida, and Texas",
        caption = "Graph: Carine Hajjar\n Data: Covid Tracking Project", 
+       subtitle = "April 20th to July 13th",
        y = "Count", 
        x = "Date")+
+  theme_bw() +
+  theme(panel.border = element_blank(), panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), axis.line = element_line(colour = "black"))+
   theme(plot.title = element_text(hjust = 0.5))+
   theme(plot.title = element_text(face = "bold"))+
   theme(plot.subtitle = element_text(hjust = 0.5))+
@@ -103,14 +118,17 @@ state_data2%>%
 #deaths per cases 
 state_data2 %>%
   filter(state %in% c("CA", "TX", "FL", "AZ", "NY", "MA", "NJ"))%>%
-  ggplot(aes(date, death/positive, colour = "var0"))+
-  geom_line()+
+  ggplot(aes(date, death/positive, colour = "steelblue4"))+
+  geom_col(colour = "steelblue4")+
   facet_wrap(vars(state))+
-  labs(title = "Daily Deaths Per Positive Case",
+  labs(title = "Daily New Deaths Per Total Positive Case",
        subtitle = "AZ, CA, FL, MA, NJ, NY, TX", 
        caption = "Graph: Carine Hajjar\n Data: Covid Tracking Project", 
-       y = "Proportion of Deaths to Positive Cases", 
+       y = "Proportion of New Deaths to Total Positive Cases", 
        x = "Date")+
+  theme_bw() +
+  theme(panel.border = element_blank(), panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), axis.line = element_line(colour = "black"))+
   theme(plot.title = element_text(hjust = 0.5))+
   theme(plot.title = element_text(face = "bold"))+
   theme(plot.subtitle = element_text(hjust = 0.5))+
@@ -135,11 +153,14 @@ percap_state_data2 %>%
   filter(state %in% c("CA", "TX", "FL", "AZ", "NY", "MA", "NJ"))%>%
   ggplot(aes(date, death/population, colour = state))+
   geom_line()+
-  labs(title = "Daily Deaths Per Capita",
+  labs(title = "Total Deaths Per Capita",
        caption = "Graph: Carine Hajjar\n Data: Covid Tracking Project", 
        subtitle = "AZ, CA, FL, MA, NJ, NY, TX", 
-       y = "Deaths Per Capita", 
+       y = "Total Deaths Per Capita", 
        x = "Date")+
+  theme_bw() +
+  theme(panel.border = element_blank(), panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), axis.line = element_line(colour = "black"))+
   theme(plot.title = element_text(hjust = 0.5))+
   theme(plot.title = element_text(face = "bold"))+
   scale_y_continuous(labels = percent_format())+
@@ -156,11 +177,36 @@ percap_state_data2 %>%
   filter(state %in% c("CA", "TX", "FL", "AZ", "NY", "MA", "NJ"))%>%
   ggplot(aes(date, positive/population, colour = state))+
   geom_line()+
-  labs(title = "Daily Total Positive Cases Per Capita",
+  labs(title = "Total Positive Cases Per Capita",
        caption = "Graph: Carine Hajjar\n Data: Covid Tracking Project", 
        subtitle = "AZ, CA, FL, MA, NJ, NY, TX", 
        y = "Total Cases Per Capita", 
        x = "Date")+
+  theme_bw() +
+  theme(panel.border = element_blank(), panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), axis.line = element_line(colour = "black"))+
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(plot.title = element_text(face = "bold"))+
+  scale_y_continuous(labels = percent_format())+
+  theme(plot.subtitle = element_text(hjust = 0.5))+
+  theme(legend.title = element_blank())+
+  geom_dl(aes(label = state), method = list(dl.trans(x = x + 0.05), "last.points", cex = 0.8))
+
+############################
+# Overall DEATHS PER POS CASE
+############################
+percap_state_data2 %>%
+  filter(state %in% c("CA", "TX", "FL", "AZ", "NY", "MA", "NJ"))%>%
+  ggplot(aes(date, death/positive, colour = state))+
+  geom_line()+
+  labs(title = "Total Deaths Per Total Positive Cases",
+       caption = "Graph: Carine Hajjar\n Data: Covid Tracking Project", 
+       subtitle = "AZ, CA, FL, MA, NJ, NY, TX", 
+       y = "Percent of Deaths per Positive Cases", 
+       x = "Date")+
+  theme_bw() +
+  theme(panel.border = element_blank(), panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), axis.line = element_line(colour = "black"))+
   theme(plot.title = element_text(hjust = 0.5))+
   theme(plot.title = element_text(face = "bold"))+
   scale_y_continuous(labels = percent_format())+
@@ -199,48 +245,57 @@ overall1<- overall%>%
 ############################
 # nation-wide cases overtim 
 ggplot(overall1, aes(x= date))+
-   geom_line(aes(y = new_pos_case, colour = "var0"))+
-  geom_line(aes(y = avg_case, colour = "var1"))+
-  labs(title = "Nationwide: Daily Cases",
+   geom_line(aes(y = new_pos_case, colour = "steelblue4"))+
+  geom_line(aes(y = avg_case, colour = "black"))+
+  labs(title = "Nationwide: Daily New Cases and Case Average",
        subtitle = "April 1st through July 12th",
        caption = "Graph: Carine Hajjar\n Data: Covid Tracking Project", 
        y = "Count", 
        x = "Date")+
+  theme_bw() +
+  theme(panel.border = element_blank(), panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), axis.line = element_line(colour = "black"))+
   theme(plot.title = element_text(hjust = 0.5))+
   theme(plot.title = element_text(face = "bold"))+
   theme(plot.subtitle = element_text(hjust = 0.5))+
   theme(legend.title = element_blank())+
-  scale_color_manual(labels = c("New Daily Positive Cases", "Moving Average"), values = c("red1", "rosybrown"))
+  scale_color_manual(labels = c("New Daily Positive Cases", "Moving Average"), values = c("steelblue4", "black"))
 
 
 ############################
 # DEAD AND DEAD AVERAGE
 ############################
 ggplot(overall1, aes(x= date))+
-  geom_line(aes(y = new_dead, colour = "var0"))+
-  geom_line(aes(y = avg_dead, colour = "var1"))+
-  labs(title = "Nationwide: Daily Deaths and Death Average",
+  geom_line(aes(y = new_dead, colour = "steelblue4"))+
+  geom_line(aes(y = avg_dead, colour = "greay23"))+
+  labs(title = "Nationwide: Daily New Deaths and Death Average",
        subtitle = "April 1st through July 12th",
        caption = "Graph: Carine Hajjar\n Data: Covid Tracking Project", 
        y = "Count", 
        x = "Date")+
+  theme_bw() +
+  theme(panel.border = element_blank(), panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), axis.line = element_line(colour = "black"))+
   theme(plot.title = element_text(hjust = 0.5))+
   theme(plot.title = element_text(face = "bold"))+
   theme(plot.subtitle = element_text(hjust = 0.5))+
   theme(legend.title = element_blank())+
-  scale_color_manual(labels = c("New Daily Deaths", "Moving Average"), values = c("red1", "rosybrown"))
+  scale_color_manual(labels = c("New Daily Deaths", "Moving Average"), values = c("steelblue4", "black"))
 # this one is good 
 
 ############################
 # DEATH PER CASE AND CASE NATIONWIDE
 ############################
-ggplot(overall1, aes(x= date, y = avg_dead/avg_case, colour = "var0"))+
-  geom_line(aes())+
-  labs(title = "Nationwide: Average Daily Deaths per Average Daily Positive Case",
+ggplot(overall1, aes(x= date, y = avg_dead/avg_case, colour = "steelblue4"))+
+  geom_line(colour = "steelblue4")+
+  labs(title = "Nationwide: Daily Proportion of Average \n New Deaths per Average New Positive Cases",
        subtitle = "April 1st through July 12th",
        caption = "Graph: Carine Hajjar\n Data: Covid Tracking Project", 
-       y = "Count", 
+       y = "Proportion of Average Death Per Average Case", 
        x = "Date")+
+  theme_bw() +
+  theme(panel.border = element_blank(), panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), axis.line = element_line(colour = "black"))+
   theme(plot.title = element_text(hjust = 0.5))+
   theme(plot.title = element_text(face = "bold"))+
   theme(plot.subtitle = element_text(hjust = 0.5))+
@@ -254,28 +309,34 @@ ggplot(overall1, aes(x= date, y = avg_dead/avg_case, colour = "var0"))+
 # CASES AND TESTS NATIONWIDE
 ############################
 ggplot(overall1, aes(x= date))+
-  geom_line(aes(y = new_test, colour = "var0"))+
-  geom_line(aes(y = new_pos_case, colour = "var1"))+
+  geom_line(aes(y = new_test, colour = "steelblue4"))+
+  geom_line(aes(y = new_pos_case, colour = "black"))+
   labs(title = "Nationwide: Daily Tests and Daily Positive Cases Overtime", 
        subtitle = "April 1 through July 12",
        caption = "Graph: Carine Hajjar\n Data: Covid Tracking Project", 
        y = "Count", 
        x = "Date")+ 
   scale_y_continuous(labels = function(overall1) format(overall1, scientific = FALSE))+
+  theme_bw() +
+  theme(panel.border = element_blank(), panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), axis.line = element_line(colour = "black"))+
   theme(plot.title = element_text(hjust = 0.5))+
   theme(plot.title = element_text(face = "bold"))+
   theme(plot.subtitle = element_text(hjust = 0.5))+
   theme(legend.title = element_blank())+
-  scale_color_manual(labels = c("New Daily Testing", "New Daily Positive Cases"), values = c("red1", "rosybrown"))
+  scale_color_manual(labels = c("New Daily Testing", "New Daily Positive Cases"), values = c("steelblue4", "black"))
 
 
 ############################
 # POS CASES PER TEST
 ############################
 # proportion of cases per test 
-ggplot(overall1, aes(x= date, y = new_pos_case/new_test, color = "var0"))+
-  geom_line()+
-  labs(title = "Nationwide: Daily Proportion of Positive Case Per Test",
+ggplot(overall1, aes(x= date, y = new_pos_case/new_test, color = "steelblue4"))+
+  geom_line(color = "steelblue4")+
+  theme_bw() +
+  theme(panel.border = element_blank(), panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), axis.line = element_line(colour = "black"))+
+  labs(title = "Nationwide: Daily Proportion of New Positive Case Per New Test",
        subtitle = "April 1 through July 12",
        caption = "Graph: Carine Hajjar\n Data: Covid Tracking Project", 
        y = "Positive Case Per Test", 
@@ -287,6 +348,29 @@ ggplot(overall1, aes(x= date, y = new_pos_case/new_test, color = "var0"))+
   theme(legend.title = element_blank(), 
         legend.position = "none")+
   scale_y_continuous(labels = percent_format(accuracy = 1))
+```
+
+```{r New Jersey}
+state_data2%>%
+  filter(state == "NJ")%>%
+  ggplot(aes(date, deathIncrease/positive, colour = "steelblue4"))+
+  geom_col(colour = "steelblue4")+
+  labs(title = "New Jersey: Daily Deaths Per Total Positive Cases",
+       caption = "Graph: Carine Hajjar\n Data: Covid Tracking Project", 
+       y = "Proportion of New Deaths to Total Positive Cases", 
+       x = "Date")+
+  theme_bw() +
+  theme(panel.border = element_blank(), panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), axis.line = element_line(colour = "black"))+
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(plot.title = element_text(face = "bold"))+
+  theme(plot.subtitle = element_text(hjust = 0.5))+
+  theme(legend.title = element_blank(), 
+        legend.position = "none")
+# spike from counting probable deaths at end of June
+
+```
+
 
 
 
