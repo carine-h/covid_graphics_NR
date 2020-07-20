@@ -17,6 +17,7 @@ library("readxl")
 library("janitor")
 library(ggplot2)
 library(dplyr)
+library(lubridate)
 
 ```
 
@@ -373,6 +374,83 @@ state_data2%>%
 
 
 
+```{r baseline code and tarrant county graphs}
+
+download.file("https://usafactsstatic.blob.core.windows.net/public/data/covid-19/covid_confirmed_usafacts.csv", "county.csv")
+county <- read_csv("county.csv")
+
+# county data 
+county_data <- county%>%
+  filter(State == "TX")%>%
+  melt(id.vars=c("countyFIPS", "County Name", "State", "stateFIPS"))%>%
+  rename(date = variable, 
+         county = `County Name`, 
+         state = `State`)%>%
+  filter(county == "Dallas County")
+
+# dates 
+y <- factor(county_data$date)%>%
+  as.Date(mydate, format = "%m/%d/%y")
+data_frame(y)
+
+# cases march 1 and past
+cases <- cbind(county_data, y)%>%
+  select(county, value, y)%>%
+  rename(date = y)%>%
+  filter(date >= as.Date("2020-03-01"))
+
+# temp data march 1- now
+dallas <- read_excel("dallascounttemp.xlsx")%>%
+  mutate(avg_temp = as.numeric(avg_temp))
+
+# temp AND case data march 1 - now 
+dallas_case_temp <- cbind(cases, dallas)
+dallas_case_temp <- dallas_case_temp[,-4]
+dallas_case_temp <- data_frame(dallas_case_temp)
+
+ggplot(dallas_case_temp, aes(x=date, y = value)) +
+  geom_line()+
+  labs(title = "Cases in Tarrant County", 
+       subtitle = "March 1st - July 19th", 
+       caption = "Graph: Carine Hajjar \n Data: USA Facts", 
+       y = "Cases",
+       x = "Date")
+
+ggplot(dallas_case_temp, aes(x=date, y = avg_temp)) +
+  geom_line()+
+  labs(title = "Temperature in Tarrant County", 
+       subtitle = "March 1st - July 19th", 
+       caption = "Graph: Carine Hajjar \n Data: USA Facts", 
+       y = "Cases",
+       x = "Date")
 
 
+
+ylim.prim <- c(0, 40500)   # in this example, precipitation
+ylim.sec <- c(40, 110)
+
+b <- diff(ylim.prim)/diff(ylim.sec)
+a <- b*(ylim.prim[1] - ylim.sec[1])
+
+ggplot(dallas_case_temp, aes(date, value)) +
+  geom_col() +
+  geom_line(aes(y = a + avg_temp*b), color = "steelblue") +
+  scale_y_continuous("Cases", sec.axis = sec_axis(~ (. - a)/b, name = "Temperature"))+
+  labs(title = "Temperature and Cases in Tarrant County", 
+       subtitle = "March 1st - July 19th", 
+       caption = "Graph: Carine Hajjar \n Data: USA Facts & Weather Underground", 
+       x = "Date")+
+  theme(axis.line.y.right = element_line(color = "steelblue"), 
+        axis.ticks.y.right = element_line(color = "steelblue"),
+        axis.text.y.right = element_text(color = "steelblue"), 
+        axis.title.y.right = element_text(color = "steelblue")
+        ) 
+
+
+
+
+
+
+  
 ```
+
